@@ -1,0 +1,6 @@
+# Ignorer le fichier .env dans le dossier config
+/Rest_And_Sleep_Api/config/.env
+
+# Ignorer node_modules
+/Rest_And_Sleep_Api/node_modules
+/Rest_And_Sleep_Electron/node_modules
