@@ -89,7 +89,7 @@ exports.deleteReservation = async (req, res) => {
         const reservation = rows[0];
 
         // Autorisé si c'est l'utilisateur qui a créé ou si Manager / PDG
-        if (reservation.utilisateur_id !== userId && ![2, 3].includes(roleId)) {
+        if (reservation.utilisateur_id !== userId && ![2, 3, 4].includes(roleId)) {
             return res.status(403).json({ error: 'Vous n\'avez pas le droit de supprimer cette réservation.' });
         }
 
@@ -118,7 +118,7 @@ exports.updateReservation = async (req, res) => {
 
         const reservation = rows[0];
 
-        if (reservation.utilisateur_id !== userId && ![2, 3].includes(roleId)) {
+        if (reservation.utilisateur_id !== userId && ![2, 3, 4].includes(roleId)) {
             return res.status(403).json({ error: 'Accès interdit : vous ne pouvez pas modifier cette réservation.' });
         }
 
