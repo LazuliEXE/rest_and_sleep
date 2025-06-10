@@ -2,69 +2,67 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Connexion - Rest And Sleep</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- Bootstrap CSS CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Connexion - Rest_And_Sleep</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #787eb0, #55d7e9);
+      height: 100vh;
+    }
+  </style>
 </head>
-    <body class="bg-light">
-
-    <div class="container d-flex align-items-center justify-content-center min-vh-100">
-        <div class="card shadow-lg p-4 rounded-4" style="width: 100%; max-width: 400px;">
-        <h2 class="text-center mb-4 text-primary">Connexion</h2>
-
-        <form id="loginForm">
-            <div class="mb-3">
-            <label for="email" class="form-label">Adresse e-mail</label>
-            <input type="email" class="form-control" id="email" placeholder="exemple@mail.com" required>
-            </div>
-
-            <div class="mb-3">
-            <label for="password" class="form-label">Mot de passe</label>
-            <input type="password" class="form-control" id="password" placeholder="********" required>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">Se connecter</button>
-        </form>
-
-        <div class="text-center mt-3">
-            <a href="./inscription.html">Pas encore inscrit ?</a>
+<body>
+  <div class="d-flex justify-content-center align-items-center vh-100">
+    <div class="card shadow p-4" style="min-width: 350px;">
+      <h3 class="text-center mb-4">Connexion à Rest_And_Sleep</h3>
+      <form id="login-form">
+        <div class="mb-3">
+          <label for="email" class="form-label">Adresse e-mail</label>
+          <input type="email" class="form-control" id="email" required placeholder="ex: alice@example.com">
         </div>
+        <div class="mb-3">
+          <label for="mot_de_passe" class="form-label">Mot de passe</label>
+          <input type="password" class="form-control" id="mot_de_passe" required placeholder="••••••••">
         </div>
+        <div id="erreur" class="text-danger mb-3"></div>
+        <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+      </form>
     </div>
+  </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const form = document.getElementById("login-form");
 
-    <!-- JS pour gérer la soumission -->
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async function (e) {
+      form.addEventListener("submit", async function(e) {
         e.preventDefault();
 
-        const email = document.getElementById('email').value;
-        const mot_de_passe = document.getElementById('password').value;
+        const email = document.getElementById("email").value;
+        const mot_de_passe = document.getElementById("mot_de_passe").value;
 
         try {
-            const response = await fetch('http://localhost:3000/users/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+          const response = await fetch("http://localhost:3000/users/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, mot_de_passe })
-            });
+          });
 
-            const data = await response.json();
+          const data = await response.json();
 
-            if (response.ok) {
-            localStorage.setItem('token', data.token);
-            window.location.href = '../dashboard.html';
-            } else {
-            alert(data.error || 'Erreur de connexion');
-            }
+          if (!response.ok) {
+            document.getElementById("erreur").textContent = data.error || "Erreur lors de la connexion.";
+            return;
+          }
 
-        } catch (err) {
-            console.error(err);
-            alert('Erreur lors de la connexion au serveur');
+          localStorage.setItem("token", data.token);
+          window.location.href = "../dashboard.html";
+
+        } catch (error) {
+          console.error("Erreur réseau :", error);
+          document.getElementById("erreur").textContent = "Erreur réseau.";
         }
-        });
-    </script>
-    </body>
+      });
+    });
+  </script>
+</body>
 </html>
