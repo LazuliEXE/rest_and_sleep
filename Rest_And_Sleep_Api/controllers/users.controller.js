@@ -109,33 +109,48 @@ exports.deleteUser = (req, res) => {
 
 
 
-// Fonction de connexion
 exports.loginUser = (req, res) => {
-    const { email, mot_de_passe } = req.body;
+  const { email, mot_de_passe } = req.body;
+  console.log("Reçu :", email, mot_de_passe);
 
-    if (!email || !mot_de_passe) {
-        return res.status(400).json({ error: 'Email et mot de passe requis.' });
+  if (!email || !mot_de_passe) {
+    return res.status(400).json({ error: 'Email et mot de passe requis.' });
+  }
+
+  db.query('SELECT * FROM utilisateurs WHERE email = ?', [email], (err, results) => {
+    if (err) {
+      console.error("Erreur SQL :", err);
+      return res.status(500).json({ error: 'Erreur serveur.' });
     }
 
-    db.query('SELECT * FROM utilisateurs WHERE email = ?', [email], (err, results) => {
-        if (err) return res.status(500).json({ error: 'Erreur serveur.' });
-        if (results.length === 0) return res.status(401).json({ error: 'Utilisateur non trouvé.' });
+    if (results.length === 0) {
+      console.log("Aucun utilisateur trouvé avec cet email");
+      return res.status(401).json({ error: 'Utilisateur non trouvé.' });
+    }
 
-        const user = results[0];
+    const user = results[0];
+    console.log("Utilisateur trouvé :", user);
 
-        bcrypt.compare(mot_de_passe, user.mot_de_passe, (err, isMatch) => {
-            if (err) return res.status(500).json({ error: 'Erreur lors de la comparaison.' });
-            if (!isMatch) return res.status(401).json({ error: 'Mot de passe incorrect.' });
-            const token = jwt.sign(
-                { id: user.id, role_id: user.role_id },
-                process.env.JWT_SECRET,
-                { expiresIn: '1h' }
-            );
+    bcrypt.compare(mot_de_passe, user.mot_de_passe, (err, isMatch) => {
+      if (err) {
+        console.error("Erreur bcrypt :", err);
+        return res.status(500).json({ error: 'Erreur lors de la comparaison.' });
+      }
 
-            res.json({ message: 'Connexion réussie', token });
-        });
+      console.log("Mot de passe match :", isMatch);
+      if (!isMatch) return res.status(401).json({ error: 'Mot de passe incorrect.' });
+
+      const token = jwt.sign(
+        { id: user.id, role_id: user.role_id },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      res.json({ message: 'Connexion réussie', token });
     });
+  });
 };
+
 
 exports.updateUser = async (req, res) => {
     const userIdToUpdate = parseInt(req.params.id, 10);
